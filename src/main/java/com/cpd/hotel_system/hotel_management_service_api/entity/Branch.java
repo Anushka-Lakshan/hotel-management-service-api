@@ -25,12 +25,12 @@ public class Branch {
     private String branchName;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinTable(name = "hotel_id")
+    @JoinColumn(name = "hotel_id")
     private Hotel hotel;
-
-    @OneToMany()
-    private List<Room> rooms;
 
     @OneToOne(mappedBy = "branch")
     private Address address;
+
+    @OneToMany(mappedBy = "branch")
+    private List<Room> rooms;
 }
