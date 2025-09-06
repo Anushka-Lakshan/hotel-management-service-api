@@ -2,6 +2,7 @@ package com.cpd.hotel_system.hotel_management_service_api.entity;
 
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.sql.Blob;
@@ -10,6 +11,11 @@ import java.util.List;
 
 @Entity
 @Table(name = "hotel")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class Hotel {
 
     @Id

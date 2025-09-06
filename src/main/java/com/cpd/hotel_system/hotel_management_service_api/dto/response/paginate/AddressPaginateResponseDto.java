@@ -8,3 +8,5 @@ public class AddressPaginateResponseDto {
     private List<ResponseAddressDto> dataList;
     private long dataCount;
 }
+
+
