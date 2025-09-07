@@ -1,8 +1,10 @@
 package com.cpd.hotel_system.hotel_management_service_api.service.impl;
 
 import com.cpd.hotel_system.hotel_management_service_api.dto.request.RequestHotelDto;
+import com.cpd.hotel_system.hotel_management_service_api.dto.response.ResponseBranchDto;
 import com.cpd.hotel_system.hotel_management_service_api.dto.response.ResponseHotelDto;
 import com.cpd.hotel_system.hotel_management_service_api.dto.response.paginate.HotelPaginateResponseDto;
+import com.cpd.hotel_system.hotel_management_service_api.entity.Branch;
 import com.cpd.hotel_system.hotel_management_service_api.entity.Hotel;
 import com.cpd.hotel_system.hotel_management_service_api.repo.HotelRepo;
 import com.cpd.hotel_system.hotel_management_service_api.service.HotelService;
@@ -23,7 +25,11 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     public void create(RequestHotelDto dto) {
-
+        try {
+            hotelRepo.save(toHotel(dto));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -72,6 +78,27 @@ public class HotelServiceImpl implements HotelService {
                         .updatedAt(hotel.getUpdatedAt())
                         .activeStatus(hotel.isActiveStatus())
                         .startingFrom(hotel.getStartingFrom())
+                        .branches(hotel.getBranches().stream().map(b ->
+                                {
+                                    try {
+                                        return toResponseBranchDto(b);
+                                    }catch (SQLException e){
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                        ).toList())
                         .build();
+    }
+
+    private ResponseBranchDto toResponseBranchDto(Branch branch) throws SQLException {
+        return branch==null?null:
+                ResponseBranchDto.builder()
+                        .branchId(branch.getBranchId())
+                        .branchName(branch.getBranchName())
+                        .branchType(branch.getBranchType())
+                        .roomCount(branch.getRoomCount())
+                        .build();
+
+
     }
 }
