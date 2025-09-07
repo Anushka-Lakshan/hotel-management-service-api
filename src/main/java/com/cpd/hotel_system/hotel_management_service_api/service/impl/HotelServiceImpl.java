@@ -11,11 +11,13 @@ import com.cpd.hotel_system.hotel_management_service_api.repo.HotelRepo;
 import com.cpd.hotel_system.hotel_management_service_api.service.HotelService;
 import com.cpd.hotel_system.hotel_management_service_api.util.BytecodeHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +62,18 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     public HotelPaginateResponseDto findAll(int page, int size, String searchText) {
-        return null;
+        return HotelPaginateResponseDto.builder()
+                .dataCount(hotelRepo.countAllHotels(searchText))
+                .dataList(
+                        hotelRepo.searchAllHotels(searchText, PageRequest.of(page, size)).stream()
+                                .map(hotel -> {
+                                    try {
+                                        return toResponseHotelDto(hotel);
+                                    } catch (SQLException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }).collect(Collectors.toList())
+                ).build();
     }
 
     private Hotel toHotel(RequestHotelDto dto) throws SQLException {
