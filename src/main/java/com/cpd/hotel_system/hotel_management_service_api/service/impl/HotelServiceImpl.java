@@ -6,6 +6,7 @@ import com.cpd.hotel_system.hotel_management_service_api.dto.response.ResponseHo
 import com.cpd.hotel_system.hotel_management_service_api.dto.response.paginate.HotelPaginateResponseDto;
 import com.cpd.hotel_system.hotel_management_service_api.entity.Branch;
 import com.cpd.hotel_system.hotel_management_service_api.entity.Hotel;
+import com.cpd.hotel_system.hotel_management_service_api.exceptions.EntryNotFoundException;
 import com.cpd.hotel_system.hotel_management_service_api.repo.HotelRepo;
 import com.cpd.hotel_system.hotel_management_service_api.service.HotelService;
 import com.cpd.hotel_system.hotel_management_service_api.util.BytecodeHandler;
@@ -33,18 +34,28 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
-    public void update(String id, RequestHotelDto dto) {
+    public void update(String id, RequestHotelDto dto) throws SQLException {
 
+        Hotel selectedHotel = hotelRepo.findById(id).orElseThrow(() -> new EntryNotFoundException("Hotel not found"));
+
+        selectedHotel.setHotelName(dto.getHotelName());
+        selectedHotel.setStarRating(dto.getStarRating());
+        selectedHotel.setDescription(bytecodeHandler.stringToBlob(dto.getDescription()));
+        selectedHotel.setStartingFrom(dto.getStartingFrom());
+        selectedHotel.setUpdatedAt(LocalDateTime.now());
+        hotelRepo.save(selectedHotel);
     }
 
     @Override
     public void delete(String id) {
-
+        hotelRepo.findById(id).orElseThrow(() -> new EntryNotFoundException("Hotel not found"));
+        hotelRepo.deleteById(id);
     }
 
     @Override
-    public ResponseHotelDto findById(String id) {
-        return null;
+    public ResponseHotelDto findById(String id) throws SQLException {
+        Hotel selectedHotel = hotelRepo.findById(id).orElseThrow(() -> new EntryNotFoundException("Hotel not found"));
+        return toResponseHotelDto(selectedHotel);
     }
 
     @Override
